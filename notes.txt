@@ -1,0 +1,11 @@
+PebbleRecipe app
+
+Phone:
+	Browser or takes url to recipe sites
+	Parses info like title, ingredients, and instructions
+	Sends that to the watch in very small pieces
+	
+Watch:
+	Just shows info from phone
+	Pressing up or down will load more from the phone
+	One button will show ingredients, one will show steps
