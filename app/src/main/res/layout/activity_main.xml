@@ -11,8 +11,39 @@
     tools:context="com.example.glennhatala.pebblerecipe.MainActivity">
 
     <TextView
-        android:text="Hello World!"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txt1" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Title"
+        android:id="@+id/btn1"
+        android:layout_below="@+id/txt1"
+        android:layout_toRightOf="@+id/txt1"
+        android:layout_toEndOf="@+id/txt1"
+        android:layout_marginLeft="31dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="85dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Ingredient"
+        android:id="@+id/btn2"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/btn1"
+        android:layout_alignLeft="@+id/btn1"
+        android:layout_alignStart="@+id/btn1" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Step"
+        android:id="@+id/btn3"
+        android:layout_marginTop="45dp"
+        android:layout_below="@+id/btn2"
+        android:layout_alignLeft="@+id/btn2"
+        android:layout_alignStart="@+id/btn2" />
 </RelativeLayout>
