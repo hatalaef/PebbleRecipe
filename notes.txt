@@ -9,3 +9,6 @@ Watch:
 	Just shows info from phone
 	Pressing up or down will load more from the phone
 	One button will show ingredients, one will show steps
+
+
+- Send stuff in three seperate types(title, ingredients, steps)? Or try to send all at once?
