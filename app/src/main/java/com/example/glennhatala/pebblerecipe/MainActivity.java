@@ -1,7 +1,6 @@
 package com.example.glennhatala.pebblerecipe;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,11 +11,6 @@ import android.widget.TextView;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -25,6 +19,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btn1;
     Button btn2;
     Button btn3;
+    Button btnOpen;
+
+    private static final String DEBUG_TAG = "PebbleRecipeDebug";
 
     private static final UUID APP_UUID = UUID.fromString("672ceda8-1ca2-402a-95dd-5109d97bef36");
     private PebbleKit.PebbleDataReceiver mDataReceiver;
@@ -43,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int RESULT = 3;
     private static final int RESULT_DONE = 4;
+    private static final int RESULT_SENDING = 5;
+
+    private String[] ingredients = new String[]{"apple", "bread", "milk"};;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +53,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn1 = (Button)findViewById(R.id.btn1);
         btn2 = (Button)findViewById(R.id.btn2);
         btn3 = (Button)findViewById(R.id.btn3);
+        btnOpen = (Button)findViewById(R.id.btnOpen);
 
         btn1.setOnClickListener(this);
         btn2.setOnClickListener(this);
         btn3.setOnClickListener(this);
+        btnOpen.setOnClickListener(this);
     }
 
     public void onClick(View v) {
-        String[] ingredients = new String[]{"apple", "bread", "milk"};
         PebbleDictionary dict = new PebbleDictionary();
         switch(v.getId()) {
             case R.id.btn1:
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
                 break;
             case R.id.btn2:
+                    isDone = false;
+                    indexCur = 0;
                     sendNextItem(ingredients, indexCur);
                 break;
             case R.id.btn3:
@@ -78,23 +81,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dict.addString(TYPE_STEP, "a step");
                 PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
                 break;
+            case R.id.btnOpen:
+                boolean isConnected = PebbleKit.isWatchConnected(this);
+                txt1.setText("Pebble connected: " + isConnected);
+                if (isConnected) {
+                    PebbleKit.startAppOnPebble(getApplicationContext(), APP_UUID);
+                }
+                break;
         }
     }
 
-    public void sendNextItem(String[] items, int index) {
+    public void sendNextItem(String[] items,int index) {
         PebbleDictionary dict = new PebbleDictionary();
-        dict.addString(0, "nothing");
-        dict.addString(TYPE_INGREDIENT, items[index]);
-        PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
-        index++;
+
         if (index < items.length) {
-            sendNextItem(items, index);
+            dict.addInt32(RESULT, RESULT_SENDING);
+            dict.addString(TYPE_INGREDIENT, items[index]);
+            PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+            Log.d(DEBUG_TAG, String.format("Sending: %d, %s", dict.getInteger(RESULT), dict.getString(TYPE_INGREDIENT)));
         }
         else {
-            dict = new PebbleDictionary();
             dict.addInt32(RESULT, RESULT_DONE);
             PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+            Log.d(DEBUG_TAG, String.format("Sending: %d",  dict.getInteger(RESULT)));
         }
+
     }
 
     @Override
@@ -106,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isConnected) {
             PebbleKit.startAppOnPebble(getApplicationContext(), APP_UUID);
         }
-        //pushMessage();
         if(mDataReceiver == null) {
             mDataReceiver = new PebbleKit.PebbleDataReceiver(APP_UUID) {
                 @Override
@@ -124,29 +134,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     if(dict.getInteger(SEND_NEXT) != null) {
                         indexCur = dict.getInteger(SEND_NEXT).intValue();
+                        sendNextItem(ingredients, indexCur);
+                        Log.d(DEBUG_TAG, String.format("Receieved: %d", dict.getInteger(SEND_NEXT)));
                     }
                     if(dict.getInteger(SEND_DONE) != null) {
                         isDone = true;
+                        Log.d(DEBUG_TAG, String.format("Receieved: %d", dict.getInteger(SEND_DONE)));
                     }
                 }
             };
             PebbleKit.registerReceivedDataHandler(getApplicationContext(), mDataReceiver);
         }
-    }
-
-
-
-    public void pushMessage() {
-        final Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
-        final Map data = new HashMap();
-        data.put("title", "Test Message");
-        data.put("body", "Body");
-        final JSONObject json = new JSONObject(data);
-        final String notificationData = new JSONArray().put(json).toString();
-
-        pebbleIntent.putExtra("messageType", "PEBBLE_ALERT");
-        pebbleIntent.putExtra("sender", "PebbleKit Android");
-        pebbleIntent.putExtra("notificationData", notificationData);
-        sendBroadcast(pebbleIntent);
     }
 }

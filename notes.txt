@@ -12,3 +12,12 @@ Watch:
 
 
 - Send stuff in three seperate types(title, ingredients, steps)? Or try to send all at once?
+
+event layout:
+    phone starts communication
+    watch says it's listening
+    while phone has data
+        send data
+        wait for watch communication
+    no more data - tells watch it's finished
+    watch can do something else
