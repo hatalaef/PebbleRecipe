@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT = 3;
     private static final int RESULT_DONE = 4;
     private static final int RESULT_SENDING = 5;
+    private static final int INDEX = 6;
 
     private String[] ingredients = new String[]{"apple", "bread", "milk"};;
 
@@ -96,9 +97,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (index < items.length) {
             dict.addInt32(RESULT, RESULT_SENDING);
+            dict.addInt32(INDEX, index);
             dict.addString(TYPE_INGREDIENT, items[index]);
             PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
-            Log.d(DEBUG_TAG, String.format("Sending: %d, %s", dict.getInteger(RESULT), dict.getString(TYPE_INGREDIENT)));
+            Log.d(DEBUG_TAG, String.format("Sending: result - %d, ing - %s, index -- %d",
+                    dict.getInteger(RESULT), dict.getString(TYPE_INGREDIENT), dict.getInteger(INDEX)));
         }
         else {
             dict.addInt32(RESULT, RESULT_DONE);
