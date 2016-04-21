@@ -33,15 +33,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int SEND_DONE = 2;
     private static final int SEND_NEXT = 3;
 
-    private static final int KEY_RESULT = 1;
-    private static final int TYPE_TITLE = 0;
-    private static final int TYPE_INGREDIENT = 1;
-    private static final int TYPE_STEP = 2;
+    private static final int TYPE_TITLE = 4;
+    private static final int TYPE_INGREDIENT = 5;
+    private static final int TYPE_STEP = 6;
 
-    private static final int RESULT = 3;
-    private static final int RESULT_DONE = 4;
-    private static final int RESULT_SENDING = 5;
-    private static final int INDEX = 6;
+    private static final int RESULT = 7;
+    private static final int RESULT_DONE = 8;
+    private static final int RESULT_SENDING = 9;
+    private static final int INDEX = 10;
 
     private String[] ingredients = new String[]{"apple", "bread", "milk"};;
 
