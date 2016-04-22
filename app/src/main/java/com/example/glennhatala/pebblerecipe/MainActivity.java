@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_SENDING = 9;
     private static final int INDEX = 10;
 
-    private String[] ingredients = new String[]{"apple", "bread", "milk"};;
+    private String title;
+    private String url;
+    private String[] ingredients;
+    private String[] steps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn2.setOnClickListener(this);
         btn3.setOnClickListener(this);
         btnOpen.setOnClickListener(this);
+
+        TestIngredient testIng = new TestIngredient();
+        testIng.fillWithTest();
+        title = testIng.getTitle();
+        url = testIng.getUrl();
+        ingredients = testIng.getIngredients();
+        steps = testIng.getSteps();
     }
 
     public void onClick(View v) {
