@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String url;
     private String[] ingredients;
     private String[] steps;
+    private int sendingType = 99;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,20 +77,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(v.getId()) {
             case R.id.btn1:
                 isDone = false;
-                dict.addString(0, "nothing");
-                dict.addString(TYPE_TITLE, "A recipe title");
+                dict.addInt32(RESULT, RESULT_SENDING);
+                dict.addString(TYPE_TITLE, title);
                 PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+                dict.addInt32(RESULT, RESULT_DONE);
                 break;
             case R.id.btn2:
-                    isDone = false;
-                    indexCur = 0;
-                    sendNextItem(ingredients, indexCur);
+                isDone = false;
+                indexCur = 0;
+                sendingType = TYPE_INGREDIENT;
+                //sendNextItem(ingredients, indexCur, TYPE_INGREDIENT);
+                sendIngredients(ingredients, indexCur, TYPE_INGREDIENT);
                 break;
             case R.id.btn3:
                 isDone = false;
-                dict.addString(0, "nothing");
-                dict.addString(TYPE_STEP, "a step");
-                PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+                indexCur = 0;
+                sendingType = TYPE_STEP;
+                //sendNextItem(ingredients, indexCur, TYPE_INGREDIENT);
+                sendSteps(steps, indexCur, sendingType);
                 break;
             case R.id.btnOpen:
                 boolean isConnected = PebbleKit.isWatchConnected(this);
@@ -101,16 +106,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void sendNextItem(String[] items,int index) {
+    public void sendIngredients(String[] items, int index, int type) {
+        PebbleDictionary dict = new PebbleDictionary();
+        String message = "";
+        for (int i = 0; i < items.length; i++) {
+            message += String.format("%d: %s%n", i + 1, items[i]);
+        }
+        message += "\n";
+        Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
+
+        dict.addInt32(RESULT, RESULT_SENDING);
+        dict.addString(type, message);
+
+        PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+        Log.d(DEBUG_TAG, String.format("Sending: result - %d, message - %s",
+                dict.getInteger(RESULT), dict.getString(type)));
+
+    }
+    public void sendSteps(String[] items, int index, int type) {
+        PebbleDictionary dict = new PebbleDictionary();
+        String message = "";
+        for (int i = 0; i < items.length; i++) {
+            message += String.format("%d: %s%n", i + 1, items[i]);
+        }
+        message += "\n";
+        Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
+
+        dict.addInt32(RESULT, RESULT_SENDING);
+        dict.addString(type, message);
+
+        PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+        Log.d(DEBUG_TAG, String.format("Sending: result - %d, message - %s",
+                dict.getInteger(RESULT), dict.getString(type)));
+
+    }
+
+    public void sendNextItem(String[] items, int index, int type) {
         PebbleDictionary dict = new PebbleDictionary();
 
         if (index < items.length) {
             dict.addInt32(RESULT, RESULT_SENDING);
             dict.addInt32(INDEX, index);
-            dict.addString(TYPE_INGREDIENT, items[index]);
+            dict.addString(type, items[index]);
             PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
-            Log.d(DEBUG_TAG, String.format("Sending: result - %d, ing - %s, index -- %d",
-                    dict.getInteger(RESULT), dict.getString(TYPE_INGREDIENT), dict.getInteger(INDEX)));
+            Log.d(DEBUG_TAG, String.format("Sending: result - %d, type - %s, index - %d",
+                    dict.getInteger(RESULT), dict.getString(type), dict.getInteger(INDEX)));
         }
         else {
             dict.addInt32(RESULT, RESULT_DONE);
@@ -146,12 +186,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     if(dict.getInteger(SEND_NEXT) != null) {
                         indexCur = dict.getInteger(SEND_NEXT).intValue();
-                        sendNextItem(ingredients, indexCur);
-                        Log.d(DEBUG_TAG, String.format("Receieved: %d", dict.getInteger(SEND_NEXT)));
+                        Log.d(DEBUG_TAG, String.format("Received: %d", dict.getInteger(SEND_NEXT)));
+                        if (sendingType == TYPE_INGREDIENT) {
+                            //sendNextItem(ingredients, indexCur, TYPE_INGREDIENT);
+                            dict = new PebbleDictionary();
+                            dict.addInt32(RESULT, RESULT_DONE);
+                            PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+                            Log.d(DEBUG_TAG, String.format("Sending: %d", dict.getInteger(RESULT)));
+                        }
+                        else if (sendingType == TYPE_STEP)
+                            dict = new PebbleDictionary();
+                            dict.addInt32(RESULT, RESULT_DONE);
+                            PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
+                            Log.d(DEBUG_TAG, String.format("Sending: %d", dict.getInteger(RESULT)));
                     }
                     if(dict.getInteger(SEND_DONE) != null) {
                         isDone = true;
-                        Log.d(DEBUG_TAG, String.format("Receieved: %d", dict.getInteger(SEND_DONE)));
+                        Log.d(DEBUG_TAG, String.format("Received: %d", dict.getInteger(SEND_DONE)));
                     }
                 }
             };

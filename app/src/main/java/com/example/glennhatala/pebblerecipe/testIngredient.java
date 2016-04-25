@@ -31,7 +31,6 @@ public class TestIngredient {
     public String[] getIngredients() {
         return ingredients;
     }
-
     public String[] getSteps() {
         return steps;
     }
