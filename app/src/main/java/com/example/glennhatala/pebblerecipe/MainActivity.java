@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String DEBUG_TAG = "PebbleRecipeDebug";
 
     private static final UUID APP_UUID = UUID.fromString("672ceda8-1ca2-402a-95dd-5109d97bef36");
+    private static final String DELIMITER = "|E|";
+
     private PebbleKit.PebbleDataReceiver mDataReceiver;
     private boolean isDone = false;
     private int indexCur = 0;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_DONE = 8;
     private static final int RESULT_SENDING = 9;
     private static final int INDEX = 10;
+    private static final int SHOW_ING = 11;
+    private static final int SHOW_STEP = 12;
 
     private String title;
     private String url;
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PebbleDictionary dict = new PebbleDictionary();
         String message = "";
         for (int i = 0; i < items.length; i++) {
-            message += String.format("%d: %s%n", i + 1, items[i]);
+            message += String.format("%d: %s%n%s", i + 1, items[i], DELIMITER);
         }
         message += "\n";
         Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
@@ -126,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void sendSteps(String[] items, int index, int type) {
         PebbleDictionary dict = new PebbleDictionary();
         String message = "";
+        //instead split send string with delimeters
         for (int i = 0; i < items.length; i++) {
             message += String.format("%d: %s%n", i + 1, items[i]);
         }
