@@ -12,6 +12,7 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,7 +25,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String DEBUG_TAG = "PebbleRecipeDebug";
 
     private static final UUID APP_UUID = UUID.fromString("672ceda8-1ca2-402a-95dd-5109d97bef36");
-    private static final String DELIMITER = "|E|";
+    private static final String DELIMITER = "|";
+    private static final String BEGINNING = "~";
+    private static final int MAX_LENGTH = 50;
 
     private PebbleKit.PebbleDataReceiver mDataReceiver;
     private boolean isDone = false;
@@ -43,8 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESULT_DONE = 8;
     private static final int RESULT_SENDING = 9;
     private static final int INDEX = 10;
-    private static final int SHOW_ING = 11;
-    private static final int SHOW_STEP = 12;
+    private static final int SHOW_TYPE = 11;
+    private static final int SHOW_ING = 12;
+    private static final int SHOW_STEP = 13;
 
     private String title;
     private String url;
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PebbleDictionary dict = new PebbleDictionary();
         String message = "";
         for (int i = 0; i < items.length; i++) {
-            message += String.format("%d: %s%n%s", i + 1, items[i], DELIMITER);
+            message += String.format("%d: %s", i + 1, items[i]);
         }
         message += "\n";
         Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
@@ -130,9 +134,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void sendSteps(String[] items, int index, int type) {
         PebbleDictionary dict = new PebbleDictionary();
         String message = "";
+        String pattern = String.format("[%s%s]", DELIMITER, BEGINNING);
         //instead split send string with delimeters
         for (int i = 0; i < items.length; i++) {
-            message += String.format("%d: %s%n", i + 1, items[i]);
+            StringBuilder stringBuilder = new StringBuilder(Pattern.compile(pattern).matcher(items[i]).replaceAll(""));
+
+                for (int j = 0; j < stringBuilder.length(); j += MAX_LENGTH) {
+
+                    while ((j > 0 && j < stringBuilder.length()) && (stringBuilder.charAt(j) != ' ' && stringBuilder.charAt(j) != '\n')) {
+                        j--;
+                    }
+                    stringBuilder.insert(j, BEGINNING);
+                }
+            message += String.format("%d: %s%n%S", i + 1, stringBuilder, DELIMITER);
         }
         message += "\n";
         Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
@@ -196,12 +210,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //sendNextItem(ingredients, indexCur, TYPE_INGREDIENT);
                             dict = new PebbleDictionary();
                             dict.addInt32(RESULT, RESULT_DONE);
+                            dict.addInt32(SHOW_TYPE, SHOW_ING);
                             PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
                             Log.d(DEBUG_TAG, String.format("Sending: %d", dict.getInteger(RESULT)));
                         }
                         else if (sendingType == TYPE_STEP)
                             dict = new PebbleDictionary();
                             dict.addInt32(RESULT, RESULT_DONE);
+                            dict.addInt32(SHOW_TYPE, SHOW_STEP);
                             PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
                             Log.d(DEBUG_TAG, String.format("Sending: %d", dict.getInteger(RESULT)));
                     }
