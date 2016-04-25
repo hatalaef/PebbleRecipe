@@ -11,7 +11,7 @@ Watch:
 	One button will show ingredients, one will show steps
 
 
-- Send stuff in three seperate types(title, ingredients, steps)? Or try to send all at once?
+- Send stuff in three separate types(title, ingredients, steps)? Or try to send all at once?
 
 event layout:
     phone starts communication
@@ -21,3 +21,6 @@ event layout:
         wait for watch communication
     no more data - tells watch it's finished
     watch can do something else
+
+-the button handlers in the watch aren't working since i switched everything around. i'm not sure where to put them.
+-for watch, maybe use a ScrollLayer? I'm not sure if the whole recipe can fit on the watch at once.
