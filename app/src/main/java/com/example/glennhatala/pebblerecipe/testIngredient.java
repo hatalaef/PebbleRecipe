@@ -13,7 +13,7 @@ public class TestIngredient {
     public void fillWithTest() {
         title = "Easy Cloud Bread";
         url = "http://allrecipes.com/recipe/246350/easy-cloud-bread/?internalSource=staff%20pick&referringContentType=home%20page";
-        ingredients = new String[]{"3 large eggs, seperated", "1/4 teaspoon cream of tartar", "2 ounces cream cheese, very soft", "1 tablespoon white surgar"};
+        ingredients = new String[]{"3 large eggs, separated", "1/4 teaspoon cream of tartar", "2 ounces cream cheese, very soft", "1 tablespoon white sugar"};
         steps = new String[5];
         steps[0] = "Preheat oven to 350 degrees F (175 degrees C). Line a baking sheet with parchment paper.";
         steps[1] = "Beat egg whites and cream of tartar together in a bowl until stiff peaks form.";
