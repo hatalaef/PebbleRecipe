@@ -24,3 +24,7 @@ event layout:
 
 -the button handlers in the watch aren't working since i switched everything around. i'm not sure where to put them.
 -for watch, maybe use a ScrollLayer? I'm not sure if the whole recipe can fit on the watch at once.
+-!!I'm sending too much data. I should divide the data into big chunks. Each app message will send 800 or so words.!!
+    Maybe measure in chunks of 800, but divide so i send the biggest chunk. So first send [800][150] as a chunk, and then
+    when they push down send [150][800] as the second chunk.
+-can i make a scroll layer for each step? or what.

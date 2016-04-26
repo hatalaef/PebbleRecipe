@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final UUID APP_UUID = UUID.fromString("672ceda8-1ca2-402a-95dd-5109d97bef36");
     private static final String DELIMITER = "|";
     private static final String BEGINNING = "~";
-    private static final int MAX_LENGTH = 50;
+    private static final int MAX_LENGTH = 100;
+    private static final int NUM_ITEMS = 8;
+    private static final int MESSAGE_SIZE = MAX_LENGTH * NUM_ITEMS;
 
     private PebbleKit.PebbleDataReceiver mDataReceiver;
     private boolean isDone = false;
@@ -73,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnOpen.setOnClickListener(this);
 
         TestIngredient testIng = new TestIngredient();
-        testIng.fillWithTest();
+        //testIng.fillWithTest();
+        testIng.fillWithTest2();
         title = testIng.getTitle();
         url = testIng.getUrl();
         ingredients = testIng.getIngredients();
@@ -137,27 +140,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String pattern = String.format("[%s%s]", DELIMITER, BEGINNING);
         //instead split send string with delimeters
         for (int i = 0; i < items.length; i++) {
+            //remove delimiter and beginning
             StringBuilder stringBuilder = new StringBuilder(Pattern.compile(pattern).matcher(items[i]).replaceAll(""));
 
-                for (int j = 0; j < stringBuilder.length(); j += MAX_LENGTH) {
+            for (int j = 0; j < stringBuilder.length(); j += MAX_LENGTH) {
 
-                    while ((j > 0 && j < stringBuilder.length()) && (stringBuilder.charAt(j) != ' ' && stringBuilder.charAt(j) != '\n')) {
-                        j--;
-                    }
-                    stringBuilder.insert(j, BEGINNING);
+                while ((j > 0 && j < stringBuilder.length()) && (stringBuilder.charAt(j) != ' ' && stringBuilder.charAt(j) != '\n')) {
+                    j--;
                 }
-            message += String.format("%d: %s%n%S", i + 1, stringBuilder, DELIMITER);
+                stringBuilder.insert(j, BEGINNING);
+            }
+            message += String.format("%d: %s%S", i + 1, stringBuilder, DELIMITER);
         }
-        message += "\n";
-        Log.d(DEBUG_TAG, String.format("Length of message: %d", message.length()));
+        Log.d(DEBUG_TAG, String.format("Message bytes: %d, length: %d", message.getBytes().length, message.length()));
 
         dict.addInt32(RESULT, RESULT_SENDING);
-        dict.addString(type, message);
+        if (message.length() > MESSAGE_SIZE) {
+            dict.addString(type, message.substring(0, MESSAGE_SIZE - 1));
+        }
+        else {
+            dict.addString(type, message);
+        }
 
         PebbleKit.sendDataToPebble(getApplicationContext(), APP_UUID, dict);
         Log.d(DEBUG_TAG, String.format("Sending: result - %d, message - %s",
                 dict.getInteger(RESULT), dict.getString(type)));
-
     }
 
     public void sendNextItem(String[] items, int index, int type) {
