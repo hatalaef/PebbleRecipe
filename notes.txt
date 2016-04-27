@@ -28,3 +28,5 @@ event layout:
     Maybe measure in chunks of 800, but divide so i send the biggest chunk. So first send [800][150] as a chunk, and then
     when they push down send [150][800] as the second chunk.
 -can i make a scroll layer for each step? or what.
+-maybe one scroll layer. [a][b][c][d][e]. then when scroll past e, take off a & b. so
+    [c][d][e][f][g], so that e is in the middle.
